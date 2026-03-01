@@ -2,10 +2,11 @@ BEGIN TRANSACTION;
 
 SELECT *
 FROM dbo.[Net Rating (07-25)]
+where Season like '2024-25'
 ORDER BY NetRtg_Percentile DESC;
 
 ALTER TABLE dbo.[Net Rating (07-25)]
-ADD NetRtg_Percentile DECIMAL(5,2);
+ALTER COLUMN NetRtg_Percentile DECIMAL(5,2);
 
 WITH Ranked AS (
     SELECT 
@@ -13,15 +14,10 @@ WITH Ranked AS (
         Player,
         Team,
         NetRtg,
-        CAST(100.0 * 
-            (CAST(NetRtg AS FLOAT) 
-             - MIN(CAST(NetRtg AS FLOAT)) OVER (PARTITION BY Season)) 
-            / NULLIF(
-                MAX(CAST(NetRtg AS FLOAT)) OVER (PARTITION BY Season) 
-                - MIN(CAST(NetRtg AS FLOAT)) OVER (PARTITION BY Season), 
-                0
-              )
-            AS DECIMAL(5,2)) AS NetRtg_Percentile
+        CAST(PERCENT_RANK() OVER (
+            PARTITION BY Season 
+            ORDER BY CAST(NetRtg AS FLOAT)
+        ) * 100 AS DECIMAL(5,2)) AS NetRtg_Percentile
     FROM dbo.[Net Rating (07-25)]
 )
 
