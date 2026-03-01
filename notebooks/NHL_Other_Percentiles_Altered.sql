@@ -38,8 +38,10 @@ RankedStats AS (
         PERCENT_RANK() OVER (PARTITION BY m.Season ORDER BY cs.calc_G60) * 100 AS pct_G60,
         PERCENT_RANK() OVER (PARTITION BY m.Season ORDER BY cs.calc_A60) * 100 AS pct_A60,
         PERCENT_RANK() OVER (PARTITION BY m.Season ORDER BY cs.calc_P60) * 100 AS pct_P60,
-        CASE WHEN TRY_CAST(m.PP AS FLOAT) <> 0 THEN PERCENT_RANK() OVER (PARTITION BY m.Season ORDER BY TRY_CAST(m.PP AS FLOAT)) * 100 END AS pct_PP,
-        CASE WHEN TRY_CAST(m.SH AS FLOAT) <> 0 THEN PERCENT_RANK() OVER (PARTITION BY m.Season ORDER BY TRY_CAST(m.SH AS FLOAT)) * 100 END AS pct_SH
+        CASE WHEN TRY_CAST(m.PP AS FLOAT) <> 0 THEN PERCENT_RANK() OVER 
+        (PARTITION BY m.Season ORDER BY TRY_CAST(m.PP AS FLOAT)) * 100 END AS pct_PP,
+        CASE WHEN TRY_CAST(m.SH AS FLOAT) <> 0 THEN PERCENT_RANK() OVER 
+        (PARTITION BY m.Season ORDER BY TRY_CAST(m.SH AS FLOAT)) * 100 END AS pct_SH
     FROM dbo.[Net Rating (07-25)] m
     JOIN CalculatedStats cs ON m.Player = cs.Player AND m.Season = cs.Season AND m.Team = cs.Team
 )
